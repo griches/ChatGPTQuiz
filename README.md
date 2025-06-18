@@ -1,4 +1,4 @@
-# ChatGPTQuiz
+# InfiniQuiz
 
 An elegant iOS quiz application that generates custom multiple-choice quizzes using OpenAI's ChatGPT API. Create quizzes on any subject and test your knowledge with intelligently generated questions.
 
@@ -74,13 +74,13 @@ An elegant iOS quiz application that generates custom multiple-choice quizzes us
 ### Setup
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/ChatGPTQuiz.git
-   cd ChatGPTQuiz
+   git clone https://github.com/yourusername/InfiniQuiz.git
+   cd InfiniQuiz
    ```
 
 2. **Open in Xcode**:
    ```bash
-   open ChatGPTQuiz.xcodeproj
+   open InfiniQuiz.xcodeproj
    ```
 
 3. **Build and Run**:
@@ -233,7 +233,7 @@ cmd + ctrl + u (with file selected)
 
 ### Test Structure
 ```
-ChatGPTQuizTests/
+InfiniQuizTests/
 ├── QuizModelTests.swift           # Model logic tests
 ├── QuizViewModelTests.swift       # ViewModel business logic
 └── KeychainHelperTests.swift      # Security and storage tests
@@ -244,20 +244,20 @@ ChatGPTQuizTests/
 ### Development
 ```bash
 # Build the project
-xcodebuild -project ChatGPTQuiz.xcodeproj -scheme ChatGPTQuiz build
+xcodebuild -project InfiniQuiz.xcodeproj -scheme InfiniQuiz build
 
 # Run on simulator
-xcodebuild -project ChatGPTQuiz.xcodeproj -scheme ChatGPTQuiz \
+xcodebuild -project InfiniQuiz.xcodeproj -scheme InfiniQuiz \
   -destination 'platform=iOS Simulator,name=iPhone 15' build
 
 # Clean build folder  
-xcodebuild -project ChatGPTQuiz.xcodeproj clean
+xcodebuild -project InfiniQuiz.xcodeproj clean
 ```
 
 ### Testing
 ```bash
 # Run all tests
-xcodebuild test -project ChatGPTQuiz.xcodeproj -scheme ChatGPTQuiz \
+xcodebuild test -project InfiniQuiz.xcodeproj -scheme InfiniQuiz \
   -destination 'platform=iOS Simulator,name=iPhone 15'
 ```
 
@@ -381,7 +381,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **API Documentation**: Refer to [OpenAI API Documentation](https://platform.openai.com/docs)
 
 ### Contact
-- **GitHub Issues**: [Create an issue](https://github.com/yourusername/ChatGPTQuiz/issues)
+- **GitHub Issues**: [Create an issue](https://github.com/yourusername/InfiniQuiz/issues)
 - **Email**: your.email@example.com
 
 ---

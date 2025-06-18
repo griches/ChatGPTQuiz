@@ -32,13 +32,13 @@ This is a SwiftUI iOS app that generates and displays multiple-choice quizzes us
 
 ```bash
 # Build the project
-xcodebuild -project ChatGPTQuiz.xcodeproj -scheme ChatGPTQuiz build
+xcodebuild -project InfiniQuiz.xcodeproj -scheme InfiniQuiz build
 
 # Run the app (requires iOS Simulator or device)
-xcodebuild -project ChatGPTQuiz.xcodeproj -scheme ChatGPTQuiz -destination 'platform=iOS Simulator,name=iPhone 15' build
+xcodebuild -project InfiniQuiz.xcodeproj -scheme InfiniQuiz -destination 'platform=iOS Simulator,name=iPhone 15' build
 
 # Clean build folder
-xcodebuild -project ChatGPTQuiz.xcodeproj clean
+xcodebuild -project InfiniQuiz.xcodeproj clean
 ```
 
 ## Important Notes

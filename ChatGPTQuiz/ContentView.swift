@@ -40,7 +40,7 @@ struct HomeView: View {
             VStack(spacing: 24) {
                 // Title Section
                 HStack {
-                    Text("ChatGPT Quiz")
+                    Text("InfiniQuiz")
                         .font(.titleBold)
                         .foregroundColor(.primaryText)
                     
