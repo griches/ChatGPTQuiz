@@ -21,9 +21,6 @@ class QuizViewModel: ObservableObject {
     }
     
     private func loadSavedPreferences() {
-        if let savedSubject = UserDefaults.standard.string(forKey: "lastSubject") {
-            subject = savedSubject
-        }
         questionCount = UserDefaults.standard.integer(forKey: "lastQuestionCount")
         if questionCount == 0 {
             questionCount = 10 // Default value
@@ -31,7 +28,6 @@ class QuizViewModel: ObservableObject {
     }
     
     private func savePreferences() {
-        UserDefaults.standard.set(subject, forKey: "lastSubject")
         UserDefaults.standard.set(questionCount, forKey: "lastQuestionCount")
     }
     
@@ -102,7 +98,14 @@ class QuizViewModel: ObservableObject {
     }
     
     func playPreviousQuiz(_ quiz: Quiz) {
-        currentQuiz = quiz
+        var freshQuiz = quiz
+        freshQuiz.questions = quiz.questions.map { question in
+            var freshQuestion = question
+            freshQuestion.userSelectedIndex = nil
+            return freshQuestion
+        }
+        freshQuiz.currentQuestionIndex = 0
+        currentQuiz = freshQuiz
         shouldNavigateToQuiz = true
     }
     

@@ -10,7 +10,16 @@ class ChatGPTService {
     
     func generateQuiz(subject: String, questionCount: Int) async throws -> Quiz {
         let prompt = """
-        Generate a multiple-choice quiz about \(subject) with \(questionCount) questions. For each question, provide exactly 3 answer choices: 1 correct answer and 2 clearly incorrect answers. The correct answer must be unambiguously correct, and the incorrect answers must be clearly wrong and not open to interpretation. Do not use trick questions or answers that could be considered correct. Format the response as JSON with the following structure: { \"questions\": [ { \"question\": \"Question text\", \"choices\": [\"Choice 1\", \"Choice 2\", \"Choice 3\"], \"correctAnswerIndex\": 0 } ] }
+        Generate a multiple-choice quiz about \(subject) with \(questionCount) questions. Follow these strict rules:
+        1. Each question must be about a completely different aspect or fact of the subject - no rephrasing or asking the same thing differently
+        2. Each question must have exactly 3 answer choices that are:
+           - Completely unique from each other (no similar or partially correct answers)
+           - Only ONE can be correct, and it must be unambiguously correct
+           - The two incorrect answers must be clearly wrong and not open to interpretation
+        3. Ensure answers don't give hints about other questions
+        4. No trick questions or "all/none of the above" options
+        
+        Format the response as JSON with the following structure: { \"questions\": [ { \"question\": \"Question text\", \"choices\": [\"Choice 1\", \"Choice 2\", \"Choice 3\"], \"correctAnswerIndex\": 0 } ] }
         """
         
         var request = URLRequest(url: URL(string: baseURL)!)
