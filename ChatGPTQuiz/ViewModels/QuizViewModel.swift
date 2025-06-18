@@ -95,6 +95,7 @@ class QuizViewModel: ObservableObject {
     func resetQuiz() {
         currentQuiz = nil
         error = nil
+        subject = ""
     }
     
     func playPreviousQuiz(_ quiz: Quiz) {
