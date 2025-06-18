@@ -21,6 +21,7 @@ class ChatGPTService {
            • Exactly **one** is correct and unambiguously so.  
            • The **two distractors** must be plausible yet factually wrong—no partial credit.  
            • Choices must not overlap in meaning.
+           • Every answer must be completly unique.
         3. Choices or wording in one question must not reveal answers to any other question.
         4. No trick questions, and never use “all/none of the above”.
 

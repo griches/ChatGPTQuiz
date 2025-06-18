@@ -173,7 +173,7 @@ struct AnswerButton: View {
                     Image(systemName: isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                         .foregroundColor(isCorrect ? .correctGreen : .incorrectRed)
                 } else if isSelected {
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(systemName: "circle.fill")
                         .foregroundColor(.accentBlue)
                 }
             }
