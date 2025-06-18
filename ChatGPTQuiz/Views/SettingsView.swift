@@ -6,6 +6,7 @@ struct SettingsView: View {
     @State private var apiToken: String = ""
     @State private var showingTokenAlert = false
     @State private var isTokenVisible = false
+    @State private var tokenPlaceholder: String = "sk-..."
     
     var body: some View {
         NavigationView {
@@ -25,26 +26,28 @@ struct SettingsView: View {
                             
                             HStack {
                                 if isTokenVisible {
-                                    TextField("sk-...", text: $apiToken)
+                                    TextField(tokenPlaceholder, text: $apiToken)
                                         .font(.bodyText)
                                         .foregroundColor(.primaryText)
                                         .autocapitalization(.none)
                                         .disableAutocorrection(true)
                                 } else {
-                                    SecureField("sk-...", text: $apiToken)
+                                    SecureField(tokenPlaceholder, text: $apiToken)
                                         .font(.bodyText)
                                         .foregroundColor(.primaryText)
                                 }
                                 
-                                Button(action: {
-                                    isTokenVisible.toggle()
-                                }) {
-                                    Image(systemName: isTokenVisible ? "eye.slash" : "eye")
-                                        .foregroundColor(.secondaryText)
+                                if !apiToken.isEmpty {
+                                    Button(action: {
+                                        isTokenVisible.toggle()
+                                    }) {
+                                        Image(systemName: isTokenVisible ? "eye.slash" : "eye")
+                                            .foregroundColor(.secondaryText)
+                                    }
                                 }
                             }
                             .padding()
-                            .background(Color.deepCharcoal)
+                            .background(Color.textFieldBackground)
                             .cornerRadius(12)
                             
                             if !apiToken.isEmpty {
@@ -70,23 +73,25 @@ struct SettingsView: View {
                     }
                     
                     // Instructions
-                    QuizCard {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("How to get an API Token")
-                                .font(.subheadingBold)
-                                .foregroundColor(.primaryText)
-                            
-                            VStack(alignment: .leading, spacing: 8) {
-                                Label("Visit platform.openai.com", systemImage: "1.circle.fill")
-                                Label("Sign in or create an account", systemImage: "2.circle.fill")
-                                Label("Navigate to API Keys section", systemImage: "3.circle.fill")
-                                Label("Create a new secret key", systemImage: "4.circle.fill")
-                                Label("Copy and paste it here", systemImage: "5.circle.fill")
-                            }
-                            .font(.bodyText)
-                            .foregroundColor(.secondaryText)
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("How to get an API Token")
+                            .font(.subheadingBold)
+                            .foregroundColor(.primaryText)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Visit platform.openai.com", systemImage: "1.circle.fill")
+                            Label("Sign in or create an account", systemImage: "2.circle.fill")
+                            Label("Navigate to API Keys section", systemImage: "3.circle.fill")
+                            Label("Create a new secret key", systemImage: "4.circle.fill")
+                            Label("Copy and paste it here", systemImage: "5.circle.fill")
                         }
+                        .font(.bodyText)
+                        .foregroundColor(.secondaryText)
                     }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.cardBackground)
+                    .cornerRadius(16)
                     
                     // Clear Token Button
                     if viewModel.hasValidAPIToken {
@@ -105,9 +110,6 @@ struct SettingsView: View {
             .background(Color.deepCharcoal)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(Color.deepCharcoal, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
@@ -122,6 +124,7 @@ struct SettingsView: View {
             Button("Clear", role: .destructive) {
                 viewModel.clearAPIToken()
                 apiToken = ""
+                tokenPlaceholder = "sk-..."
             }
         } message: {
             Text("This will remove your stored API token. You'll need to enter it again to generate new quizzes.")
@@ -130,6 +133,9 @@ struct SettingsView: View {
             // Don't show the actual token for security
             if viewModel.hasValidAPIToken {
                 apiToken = ""
+                tokenPlaceholder = "Token saved (hidden for security)"
+            } else {
+                tokenPlaceholder = "sk-..."
             }
         }
     }

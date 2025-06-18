@@ -19,16 +19,27 @@ struct ResultsView: View {
         .navigationTitle("Results")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .toolbarBackground(Color.deepCharcoal, for: .navigationBar)
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
     }
     
     @ViewBuilder
     private func scoreSummary(for quiz: Quiz) -> some View {
-        QuizCard {
-            ScoreDisplay(score: quiz.score, total: quiz.totalQuestions)
+        VStack(spacing: 12) {
+            Text("Quiz Results")
+                .font(.titleBold)
+                .foregroundColor(.primaryText)
+            
+            Text("\(quiz.score) out of \(quiz.totalQuestions) correct")
+                .font(.subheadingBold)
+                .foregroundColor(.secondaryText)
+            
+            Text("\(Int((Double(quiz.score) / Double(quiz.totalQuestions)) * 100))%")
+                .font(.scoreText)
+                .foregroundColor(scoreColor(score: Double(quiz.score) / Double(quiz.totalQuestions)))
         }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(Color.cardBackground)
+        .cornerRadius(16)
     }
     
     @ViewBuilder
@@ -57,8 +68,15 @@ struct ResultsView: View {
     
     private var tryAnotherQuizButton: some View {
         PrimaryButton("Try Another Quiz") {
-            viewModel.resetQuiz()
-            path.removeLast(path.count)
+            // Pop back to root by removing all items from path
+            while !path.isEmpty {
+                path.removeLast()
+            }
+            
+            // Reset quiz after navigation animation completes
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                viewModel.resetQuiz()
+            }
         }
     }
     
@@ -67,7 +85,7 @@ struct ResultsView: View {
         case 0.8...1.0:
             return .correctGreen
         case 0.6..<0.8:
-            return .orange
+            return Color(.systemOrange)
         default:
             return .incorrectRed
         }
@@ -84,18 +102,18 @@ struct IncorrectAnswerView: View {
             
             HStack {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.red)
+                    .foregroundColor(.incorrectRed)
                 Text("Your answer: \(question.choices[question.userSelectedIndex ?? 0])")
             }
             
             HStack {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
+                    .foregroundColor(.correctGreen)
                 Text("Correct answer: \(question.choices[question.correctAnswerIndex])")
             }
         }
         .padding()
-        .background(Color.gray.opacity(0.1))
+        .background(Color.textFieldBackground)
         .cornerRadius(8)
     }
 } 

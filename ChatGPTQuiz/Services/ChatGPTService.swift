@@ -10,17 +10,38 @@ class ChatGPTService {
     
     func generateQuiz(subject: String, questionCount: Int) async throws -> Quiz {
         let prompt = """
-        Generate a multiple-choice quiz about \(subject) with \(questionCount) questions. Follow these strict rules:
-        1. Each question must be about a completely different aspect or fact of the subject - no rephrasing or asking the same thing differently
-        2. Each question must have exactly 3 answer choices that are:
-           - Completely unique from each other (no similar or partially correct answers)
-           - Only ONE can be correct, and it must be unambiguously correct
-           - The two incorrect answers must be clearly wrong and not open to interpretation
-        3. Ensure answers don't give hints about other questions
-        4. No trick questions or "all/none of the above" options
-        
-        Format the response as JSON with the following structure: { \"questions\": [ { \"question\": \"Question text\", \"choices\": [\"Choice 1\", \"Choice 2\", \"Choice 3\"], \"correctAnswerIndex\": 0 } ] }
+        You are an assessment generator.
+
+        TASK
+        Generate a multiple-choice quiz about **\(subject)** containing **\(questionCount)** questions.
+
+        QUESTION RULES
+        1. Cover a *different* facet of \(subject) in each question (e.g. terminology, history, applications, key figures, recent developments).
+        2. Each question must have exactly **three** answer choices:
+           • Exactly **one** is correct and unambiguously so.  
+           • The **two distractors** must be plausible yet factually wrong—no partial credit.  
+           • Choices must not overlap in meaning.
+        3. Choices or wording in one question must not reveal answers to any other question.
+        4. No trick questions, and never use “all/none of the above”.
+
+        OUTPUT RULES
+        • **Return ONLY valid JSON** – no markdown, comments, or code fences.  
+        • **Do not add, remove, or rename keys. Keep this exact order.**
+
+        EXAMPLE
+        {
+          "questions": [
+            {
+              "question": "Sample question text",
+              "choices": ["Option A", "Option B", "Option C"],
+              "correctAnswerIndex": 1
+            }
+          ]
+        }
+
+        BEGIN.
         """
+
         
         var request = URLRequest(url: URL(string: baseURL)!)
         request.httpMethod = "POST"

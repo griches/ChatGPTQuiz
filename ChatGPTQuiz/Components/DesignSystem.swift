@@ -2,13 +2,57 @@ import SwiftUI
 
 // MARK: - Color Extensions
 extension Color {
-    static let deepCharcoal = Color(hex: "0C0C0F")
-    static let cardBackground = Color(hex: "1C1C20")
-    static let primaryText = Color.white
-    static let secondaryText = Color(hex: "AFAFB3")
-    static let accentBlue = Color(hex: "0A84FF")
-    static let correctGreen = Color(hex: "32D74B")
-    static let incorrectRed = Color(hex: "FF453A")
+    // Custom adaptive background colors with better contrast
+    static let deepCharcoal = Color(UIColor { traitCollection in
+        switch traitCollection.userInterfaceStyle {
+        case .dark:
+            return UIColor(red: 0.047, green: 0.047, blue: 0.059, alpha: 1.0) // #0C0C0F (original dark)
+        case .light, .unspecified:
+            return UIColor.systemBackground // Pure white for maximum contrast
+        @unknown default:
+            return UIColor.systemBackground
+        }
+    })
+    
+    static let cardBackground = Color(UIColor { traitCollection in
+        switch traitCollection.userInterfaceStyle {
+        case .dark:
+            return UIColor(red: 0.110, green: 0.110, blue: 0.125, alpha: 1.0) // #1C1C20 (original dark)
+        case .light, .unspecified:
+            return UIColor(red: 0.90, green: 0.90, blue: 0.92, alpha: 1.0) // Darker gray for more contrast
+        @unknown default:
+            return UIColor.secondarySystemBackground
+        }
+    })
+    
+    static let textFieldBackground = Color(UIColor { traitCollection in
+        switch traitCollection.userInterfaceStyle {
+        case .dark:
+            return UIColor.tertiarySystemBackground
+        case .light, .unspecified:
+            return UIColor(red: 0.85, green: 0.85, blue: 0.87, alpha: 1.0) // Darker for more contrast
+        @unknown default:
+            return UIColor.tertiarySystemBackground
+        }
+    })
+    
+    // Text colors that adapt to light/dark mode
+    static let primaryText = Color(.label)
+    static let secondaryText = Color(UIColor { traitCollection in
+        switch traitCollection.userInterfaceStyle {
+        case .dark:
+            return UIColor(red: 0.686, green: 0.686, blue: 0.702, alpha: 1.0) // #AFAFB3 (original)
+        case .light, .unspecified:
+            return UIColor(red: 0.4, green: 0.4, blue: 0.4, alpha: 1.0) // Darker gray for better contrast
+        @unknown default:
+            return UIColor.secondaryLabel
+        }
+    })
+    
+    // System accent colors (these are already adaptive)
+    static let accentBlue = Color(.systemBlue)
+    static let correctGreen = Color(.systemGreen)
+    static let incorrectRed = Color(.systemRed)
     
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -58,7 +102,16 @@ struct QuizCard<Content: View>: View {
             .padding()
             .background(Color.cardBackground)
             .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .shadow(color: Color(UIColor { traitCollection in
+                switch traitCollection.userInterfaceStyle {
+                case .dark:
+                    return UIColor.systemGray4.withAlphaComponent(0.3)
+                case .light, .unspecified:
+                    return UIColor.systemGray2.withAlphaComponent(0.6) // Even stronger shadow in light mode
+                @unknown default:
+                    return UIColor.systemGray4.withAlphaComponent(0.3)
+                }
+            }), radius: 6, x: 0, y: 3)
     }
 }
 
@@ -74,7 +127,12 @@ struct PrimaryButton: View {
     }
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            // Add haptic feedback for button taps
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+            impactFeedback.impactOccurred()
+            action()
+        }) {
             HStack {
                 if isLoading {
                     ProgressView()
@@ -161,7 +219,7 @@ struct ScoreDisplay: View {
         case 0.8...1.0:
             return .correctGreen
         case 0.6..<0.8:
-            return .orange
+            return Color(.systemOrange)
         default:
             return .incorrectRed
         }
@@ -223,7 +281,12 @@ struct PreviousQuizRow: View {
     let action: () -> Void
     
     var body: some View {
-        Button(action: action) {
+        Button(action: {
+            // Add haptic feedback for quiz row taps
+            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            impactFeedback.impactOccurred()
+            action()
+        }) {
             HStack {
                 Text(subject)
                     .font(.bodyText)
@@ -238,6 +301,7 @@ struct PreviousQuizRow: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 14)
+            .frame(maxWidth: .infinity, minHeight: 44)
             .background(Color.cardBackground)
             .cornerRadius(10)
         }
