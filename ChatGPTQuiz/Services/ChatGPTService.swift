@@ -20,16 +20,18 @@ class ChatGPTService {
         2. Each question must have exactly **three** answer choices …
         3. The question text may not contain, hint at, or restate the correct answer.
         4. The correct answer must appear verbatim in the `choices` array exactly once.
-        5. **Match wording ⇒ answer type.**  
-           • If the stem asks for a *nickname, epithet, slogan, motto,* etc., the correct answer must be an **informal moniker actually used in reliable sources**—never a formal title or office.  
-           • If the stem asks for a *title, office, regnal name, position,* etc., the correct answer must be a **formal designation**—never an informal nickname.  
-           • Discard any draft question that does not pass this check and write a new one.
-        6. Choices or wording in one question must not reveal answers to any other question.
-        7. No trick questions, and never use “all/none of the above”.
+        5. Match wording ⇒ answer type.   // (rule you just added)
+        6. **Factual-accuracy check.**
+           • The model must be **100 % certain** that the correct answer is supported by mainstream, reputable sources.  
+           • If certainty is < 100 %, the entire question must be discarded and replaced with a new one on a different facet.  
+           • Internal reasoning is allowed, but the final output **must remain ONLY the JSON object**.
+        7. (no cross-question clues, etc.)
 
         OUTPUT RULES
-        • **Return ONLY valid JSON** – no markdown, comments, or code fences.  
-        • **Do not add, remove, or rename keys. Keep this exact order.**
+        • Return ONLY valid JSON – no markdown, comments, or code fences.  
+        • **Add an “explanation” key (string) inside each question object** that
+          cites one authoritative source or gives a one-sentence justification.
+          (You can strip this field out in production if you don’t want to show users.)
 
         EXAMPLE
         {
@@ -117,11 +119,12 @@ class ChatGPTService {
             let question: String
             let choices: [String]
             let correctAnswerIndex: Int
+            let explanation: String?
         }
         
         let questionsWrapper = try JSONDecoder().decode(QuestionsWrapper.self, from: jsonData)
         let questions = questionsWrapper.questions.map { q in
-            Question(question: q.question, choices: q.choices, correctAnswerIndex: q.correctAnswerIndex)
+            Question(question: q.question, choices: q.choices, correctAnswerIndex: q.correctAnswerIndex, explanation: q.explanation)
         }
         
         // TODO: Add robust error handling if the response is not as expected

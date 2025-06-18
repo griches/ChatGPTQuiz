@@ -264,6 +264,7 @@ struct IncorrectAnswerCard: View {
     let question: String
     let userAnswer: String
     let correctAnswer: String
+    let explanation: String?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -285,6 +286,17 @@ struct IncorrectAnswerCard: View {
                 Text("Correct answer: \(correctAnswer)")
                     .font(.bodyText)
                     .foregroundColor(.secondaryText)
+            }
+            
+            if let explanation = explanation, !explanation.isEmpty {
+                HStack(alignment: .top) {
+                    Image(systemName: "info.circle.fill")
+                        .foregroundColor(.accentBlue)
+                    Text(explanation)
+                        .font(.bodyText)
+                        .foregroundColor(.secondaryText)
+                        .multilineTextAlignment(.leading)
+                }
             }
         }
         .padding()

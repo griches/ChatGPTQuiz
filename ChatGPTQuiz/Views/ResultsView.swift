@@ -57,7 +57,8 @@ struct ResultsView: View {
                             IncorrectAnswerCard(
                                 question: question.question,
                                 userAnswer: question.choices[question.userSelectedIndex ?? 0],
-                                correctAnswer: question.choices[question.correctAnswerIndex]
+                                correctAnswer: question.choices[question.correctAnswerIndex],
+                                explanation: question.explanation
                             )
                         }
                     }
@@ -110,6 +111,17 @@ struct IncorrectAnswerView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.correctGreen)
                 Text("Correct answer: \(question.choices[question.correctAnswerIndex])")
+            }
+            
+            if let explanation = question.explanation, !explanation.isEmpty {
+                HStack(alignment: .top) {
+                    Image(systemName: "info.circle.fill")
+                        .foregroundColor(.accentBlue)
+                    Text(explanation)
+                        .font(.bodyText)
+                        .foregroundColor(.secondaryText)
+                        .multilineTextAlignment(.leading)
+                }
             }
         }
         .padding()

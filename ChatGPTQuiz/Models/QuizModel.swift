@@ -6,12 +6,14 @@ struct Question: Identifiable, Codable {
     var choices: [String]
     var correctAnswerIndex: Int
     var userSelectedIndex: Int?
+    let explanation: String?
     
-    init(id: UUID = UUID(), question: String, choices: [String], correctAnswerIndex: Int) {
+    init(id: UUID = UUID(), question: String, choices: [String], correctAnswerIndex: Int, explanation: String? = nil) {
         self.id = id
         self.question = question
         self.choices = choices
         self.correctAnswerIndex = correctAnswerIndex
+        self.explanation = explanation
     }
 }
 
