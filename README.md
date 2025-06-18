@@ -193,7 +193,6 @@ struct Quiz: Identifiable, Codable {
 The app includes comprehensive unit tests:
 
 - **`QuizModelTests`**: Model logic and scoring
-- **`QuizModelCodableTests`**: Serialization testing  
 - **`QuizViewModelTests`**: Business logic and state management
 - **`KeychainHelperTests`**: Secure storage functionality
 
@@ -210,7 +209,6 @@ cmd + ctrl + u (with file selected)
 ```
 ChatGPTQuizTests/
 ├── QuizModelTests.swift           # Model logic tests
-├── QuizModelCodableTests.swift    # JSON serialization tests
 ├── QuizViewModelTests.swift       # ViewModel business logic
 └── KeychainHelperTests.swift      # Security and storage tests
 ```
