@@ -30,7 +30,33 @@ An elegant iOS quiz application that generates custom multiple-choice quizzes us
 
 ## Screenshots
 
-*Coming soon - Add screenshots of the app in both light and dark mode*
+### 📱 iPhone 16 Pro Max (1320 x 2868 pixels)
+
+<div align="center">
+
+| Light Mode | Dark Mode |
+|------------|-----------|
+| ![Home Screen Light](screenshots/02_Home_Screen_Light_Mode.png) | ![Home Screen Dark](screenshots/01_Home_Screen_Dark_Mode.png) |
+| **Home Screen** - Quiz creation interface | **Home Screen** - Clean, adaptive design |
+
+</div>
+
+<div align="center">
+
+| Quiz Taking | Results with Explanations |
+|-------------|---------------------------|
+| ![Quiz Light](screenshots/03_Quiz_Taking_Light_Mode.png) | ![Results Light](screenshots/06_Results_With_Explanations_Light_Mode.png) |
+| **Active Quiz** - Multiple choice questions | **Results Screen** - Score and detailed explanations |
+
+</div>
+
+### ✨ Key Features Shown
+- **🎨 Adaptive Design**: Seamless light and dark mode support
+- **📊 Progress Tracking**: Visual progress bar during quizzes  
+- **🎯 Answer Selection**: Clear selection indicators with blue accent
+- **📈 Detailed Results**: Score percentage with explanations for wrong answers
+- **ℹ️ Educational Value**: Authoritative explanations help users learn
+- **📱 Responsive UI**: Optimized for all iPhone screen sizes
 
 ## Requirements
 
@@ -311,6 +337,16 @@ xcodebuild test -project ChatGPTQuiz.xcodeproj -scheme ChatGPTQuiz \
 Enable debug logging by modifying the ChatGPTService error handling for detailed API response information.
 
 ## Roadmap
+
+### ✅ Completed Features
+- [x] **Core Quiz Functionality**: AI-powered quiz generation with ChatGPT
+- [x] **Adaptive UI Design**: Full light and dark mode support
+- [x] **Secure API Management**: Keychain storage for OpenAI tokens
+- [x] **Quiz History**: Save and replay previous quizzes
+- [x] **Haptic Feedback**: Tactile responses throughout the app
+- [x] **Answer Explanations**: Educational explanations for wrong answers
+- [x] **Comprehensive Testing**: Unit tests for models, ViewModels, and services
+- [x] **Professional Screenshots**: App Store ready marketing materials
 
 ### Planned Features
 - [ ] **Custom Quiz Categories**: Predefined subject categories

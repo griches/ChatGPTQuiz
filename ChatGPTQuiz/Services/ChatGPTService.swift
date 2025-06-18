@@ -24,6 +24,7 @@ class ChatGPTService {
         6. **Factual-accuracy check.**
            • The model must be **100 % certain** that the correct answer is supported by mainstream, reputable sources.  
            • If certainty is < 100 %, the entire question must be discarded and replaced with a new one on a different facet.  
+           • If you are not 100 % sure the fact is true OR cannot cite a source, throw the fact away and restart the task. 
            • Internal reasoning is allowed, but the final output **must remain ONLY the JSON object**.
         7. (no cross-question clues, etc.)
 
