@@ -1,4 +1,18 @@
 import SwiftUI
+import UIKit
+
+// MARK: - Keyboard Dismissal Extension
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+    
+    func dismissKeyboardOnTap() -> some View {
+        self.onTapGesture {
+            hideKeyboard()
+        }
+    }
+}
 
 // MARK: - Color Extensions
 extension Color {

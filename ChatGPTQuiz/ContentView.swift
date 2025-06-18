@@ -143,6 +143,7 @@ struct HomeView: View {
         .scrollBounceBehavior(.basedOnSize)
         .background(Color.deepCharcoal)
         .navigationBarHidden(true)
+        .dismissKeyboardOnTap()
         .sheet(isPresented: $showingSettings) {
             SettingsView(viewModel: viewModel)
         }

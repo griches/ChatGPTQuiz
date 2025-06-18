@@ -119,6 +119,7 @@ struct SettingsView: View {
                 }
             }
         }
+        .dismissKeyboardOnTap()
         .alert("Clear API Token?", isPresented: $showingTokenAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Clear", role: .destructive) {
