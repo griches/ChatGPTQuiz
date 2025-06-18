@@ -39,8 +39,20 @@ class ChatGPTService {
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw QuizError.networkError
+        }
+        
+        // Check for authentication errors
+        if httpResponse.statusCode == 401 {
+            throw QuizError.apiError("Invalid API key. Please check your settings.")
+        }
+        
+        if httpResponse.statusCode == 429 {
+            throw QuizError.apiError("Rate limit exceeded. Please wait and try again.")
+        }
+        
+        guard (200...299).contains(httpResponse.statusCode) else {
             throw QuizError.networkError
         }
         

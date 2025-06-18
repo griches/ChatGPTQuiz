@@ -11,13 +11,15 @@ class QuizViewModel: ObservableObject {
     @Published var error: String?
     @Published var shouldNavigateToQuiz: Bool = false
     @Published var previousQuizzes: [Quiz] = []
+    @Published var hasValidAPIToken: Bool = false
     
-    private let chatGPTService: ChatGPTService
+    private var chatGPTService: ChatGPTService?
+    private let keychainHelper = KeychainHelper.shared
     
-    init(apiKey: String) {
-        self.chatGPTService = ChatGPTService(apiKey: apiKey)
+    init() {
         loadSavedPreferences()
         loadPreviousQuizzes()
+        checkAPIToken()
     }
     
     private func loadSavedPreferences() {
@@ -51,11 +53,16 @@ class QuizViewModel: ObservableObject {
             return
         }
         
+        guard let service = chatGPTService else {
+            error = "Please configure your OpenAI API token in Settings"
+            return
+        }
+        
         isLoading = true
         error = nil
         
         do {
-            var quiz = try await chatGPTService.generateQuiz(
+            var quiz = try await service.generateQuiz(
                 subject: subject,
                 questionCount: questionCount
             )
@@ -77,6 +84,15 @@ class QuizViewModel: ObservableObject {
             savePreviousQuizzes()
             shouldNavigateToQuiz = true
             savePreferences()
+        } catch let quizError as QuizError {
+            switch quizError {
+            case .apiError(let message):
+                self.error = message
+            case .invalidResponse:
+                self.error = "Invalid response from API. Please try again."
+            case .networkError:
+                self.error = "Network error. Please check your connection."
+            }
         } catch {
             self.error = error.localizedDescription
         }
@@ -113,5 +129,35 @@ class QuizViewModel: ObservableObject {
     func deletePreviousQuiz(at offsets: IndexSet) {
         previousQuizzes.remove(atOffsets: offsets)
         savePreviousQuizzes()
+    }
+    
+    // MARK: - API Token Management
+    
+    private func checkAPIToken() {
+        if let token = keychainHelper.retrieve() {
+            chatGPTService = ChatGPTService(apiKey: token)
+            hasValidAPIToken = true
+        } else {
+            // Use a default token if available (for demo purposes)
+            // This should be removed in production
+            hasValidAPIToken = false
+        }
+    }
+    
+    func saveAPIToken(_ token: String) {
+        guard !token.isEmpty else { return }
+        
+        if keychainHelper.save(token) {
+            chatGPTService = ChatGPTService(apiKey: token)
+            hasValidAPIToken = true
+        } else {
+            error = "Failed to save API token"
+        }
+    }
+    
+    func clearAPIToken() {
+        _ = keychainHelper.delete()
+        chatGPTService = nil
+        hasValidAPIToken = false
     }
 } 
