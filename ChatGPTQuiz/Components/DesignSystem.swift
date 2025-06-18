@@ -8,9 +8,13 @@ extension View {
     }
     
     func dismissKeyboardOnTap() -> some View {
-        self.onTapGesture {
-            hideKeyboard()
-        }
+        self.background(
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    hideKeyboard()
+                }
+        )
     }
 }
 

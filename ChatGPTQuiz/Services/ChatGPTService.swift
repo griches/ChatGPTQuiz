@@ -16,14 +16,16 @@ class ChatGPTService {
         Generate a multiple-choice quiz about **\(subject)** containing **\(questionCount)** questions.
 
         QUESTION RULES
-        1. Cover a *different* facet of \(subject) in each question (e.g. terminology, history, applications, key figures, recent developments).
-        2. Each question must have exactly **three** answer choices:
-           • Exactly **one** is correct and unambiguously so.  
-           • The **two distractors** must be plausible yet factually wrong—no partial credit.  
-           • Choices must not overlap in meaning.
-           • Every answer must be completly unique.
-        3. Choices or wording in one question must not reveal answers to any other question.
-        4. No trick questions, and never use “all/none of the above”.
+        1. Cover a *different* facet of \(subject) in each question …
+        2. Each question must have exactly **three** answer choices …
+        3. The question text may not contain, hint at, or restate the correct answer.
+        4. The correct answer must appear verbatim in the `choices` array exactly once.
+        5. **Match wording ⇒ answer type.**  
+           • If the stem asks for a *nickname, epithet, slogan, motto,* etc., the correct answer must be an **informal moniker actually used in reliable sources**—never a formal title or office.  
+           • If the stem asks for a *title, office, regnal name, position,* etc., the correct answer must be a **formal designation**—never an informal nickname.  
+           • Discard any draft question that does not pass this check and write a new one.
+        6. Choices or wording in one question must not reveal answers to any other question.
+        7. No trick questions, and never use “all/none of the above”.
 
         OUTPUT RULES
         • **Return ONLY valid JSON** – no markdown, comments, or code fences.  
