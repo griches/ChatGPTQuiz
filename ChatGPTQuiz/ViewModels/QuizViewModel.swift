@@ -23,10 +23,8 @@ class QuizViewModel: ObservableObject {
     }
     
     private func loadSavedPreferences() {
-        questionCount = UserDefaults.standard.integer(forKey: "lastQuestionCount")
-        if questionCount == 0 {
-            questionCount = 10 // Default value
-        }
+        let savedCount = UserDefaults.standard.integer(forKey: "lastQuestionCount")
+        questionCount = savedCount > 0 ? savedCount : 10
     }
     
     private func savePreferences() {
