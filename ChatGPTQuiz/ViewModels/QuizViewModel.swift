@@ -27,7 +27,7 @@ class QuizViewModel: ObservableObject {
         questionCount = savedCount > 0 ? savedCount : 10
     }
     
-    private func savePreferences() {
+    func savePreferences() {
         UserDefaults.standard.set(questionCount, forKey: "lastQuestionCount")
     }
     
@@ -81,7 +81,6 @@ class QuizViewModel: ObservableObject {
             previousQuizzes.insert(quiz, at: 0)
             savePreviousQuizzes()
             shouldNavigateToQuiz = true
-            savePreferences()
         } catch let quizError as QuizError {
             switch quizError {
             case .apiError(let message):

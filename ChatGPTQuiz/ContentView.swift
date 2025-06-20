@@ -118,6 +118,9 @@ struct HomeView: View {
                         .pickerStyle(.segmented)
                         .background(themeManager.currentTheme.cardBackground)
                         .cornerRadius(8)
+                        .onChange(of: viewModel.questionCount) { _, _ in
+                            viewModel.savePreferences()
+                        }
                         
                         if let error = viewModel.error {
                             Text(error)
