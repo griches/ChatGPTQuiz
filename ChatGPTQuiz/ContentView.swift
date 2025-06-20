@@ -162,6 +162,27 @@ struct HomeView: View {
                                     .listRowBackground(Color.clear)
                                     .listRowSeparator(.hidden)
                                     .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        Button {
+                                            // Add haptic feedback for swipe delete
+                                            let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
+                                            impactFeedback.impactOccurred()
+                                            
+                                            if let index = viewModel.previousQuizzes.firstIndex(where: { $0.id == quiz.id }) {
+                                                viewModel.deletePreviousQuiz(at: IndexSet(integer: index))
+                                            }
+                                        } label: {
+                                            Image(systemName: "trash")
+                                                .font(.system(size: 16, weight: .semibold))
+                                                .foregroundColor(.white)
+                                                .frame(width: 50, height: 32)
+                                                .background(
+                                                    Capsule()
+                                                        .fill(Color.red)
+                                                )
+                                        }
+                                        .tint(.clear)
+                                    }
                                     .contextMenu {
                                         Button(role: .destructive) {
                                             // Add haptic feedback for deletion
@@ -175,13 +196,6 @@ struct HomeView: View {
                                             Label("Delete", systemImage: "trash")
                                         }
                                     }
-                                }
-                                .onDelete { offsets in
-                                    // Add haptic feedback for swipe delete
-                                    let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
-                                    impactFeedback.impactOccurred()
-                                    
-                                    viewModel.deletePreviousQuiz(at: offsets)
                                 }
                             }
                             .listStyle(PlainListStyle())
