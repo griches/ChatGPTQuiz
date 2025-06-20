@@ -209,9 +209,7 @@ class ThemeManager: ObservableObject {
     }
     
     func setColorSchemePreference(_ preference: ColorSchemePreference) {
-        withAnimation(.easeInOut(duration: 0.6)) {
-            colorSchemePreference = preference
-        }
+        colorSchemePreference = preference
         saveColorSchemePreference(preference)
     }
     
