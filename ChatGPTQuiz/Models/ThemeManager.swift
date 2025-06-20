@@ -6,14 +6,14 @@ enum ColorSchemePreference: String, CaseIterable {
     case light = "Light"
     case device = "Device Settings"
     
-    var colorScheme: ColorScheme? {
+    func colorScheme(systemScheme: ColorScheme) -> ColorScheme? {
         switch self {
         case .dark:
             return .dark
         case .light:
             return .light
         case .device:
-            return nil
+            return systemScheme
         }
     }
 }
@@ -140,6 +140,7 @@ class ThemeManager: ObservableObject {
     @Published var currentTheme: AppTheme = .space
     @Published var isAnimating = false
     @Published var colorSchemePreference: ColorSchemePreference = .dark
+    @Published var systemColorScheme: ColorScheme = .dark
     
     private var timer: Timer?
     private let userDefaults = UserDefaults.standard
@@ -150,7 +151,26 @@ class ThemeManager: ObservableObject {
     init() {
         loadTheme()
         loadColorSchemePreference()
+        detectSystemColorScheme()
         setupAutoTheme()
+    }
+    
+    private func detectSystemColorScheme() {
+        let detectedScheme: ColorScheme = UITraitCollection.current.userInterfaceStyle == .dark ? .dark : .light
+        systemColorScheme = detectedScheme
+    }
+    
+    func refreshSystemColorScheme() {
+        let detectedScheme: ColorScheme = UITraitCollection.current.userInterfaceStyle == .dark ? .dark : .light
+        systemColorScheme = detectedScheme
+    }
+    
+    var effectiveColorScheme: ColorScheme? {
+        colorSchemePreference.colorScheme(systemScheme: systemColorScheme)
+    }
+    
+    func updateSystemColorScheme(_ scheme: ColorScheme) {
+        systemColorScheme = scheme
     }
     
     func setTheme(_ theme: AppTheme) {
@@ -209,7 +229,9 @@ class ThemeManager: ObservableObject {
     }
     
     func setColorSchemePreference(_ preference: ColorSchemePreference) {
-        colorSchemePreference = preference
+        withAnimation(.easeInOut(duration: 0.6)) {
+            colorSchemePreference = preference
+        }
         saveColorSchemePreference(preference)
     }
     

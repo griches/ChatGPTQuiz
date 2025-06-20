@@ -4,6 +4,7 @@ struct SettingsView: View {
     @ObservedObject var viewModel: QuizViewModel
     @EnvironmentObject var themeManager: ThemeManager
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var systemColorScheme
     @State private var apiToken: String = ""
     @State private var showingTokenAlert = false
     @State private var isTokenVisible = false
@@ -160,11 +161,16 @@ struct SettingsView: View {
                 }
             }
         }
-        .preferredColorScheme(themeManager.colorSchemePreference.colorScheme)
+        .preferredColorScheme(themeManager.effectiveColorScheme)
+        .animation(.easeInOut(duration: 0.6), value: themeManager.colorSchemePreference)
+        .onAppear {
+            themeManager.refreshSystemColorScheme()
+        }
         .sheet(isPresented: $showingThemeSelection) {
             ThemeSelectionView()
                 .environmentObject(themeManager)
-                .preferredColorScheme(themeManager.colorSchemePreference.colorScheme)
+                .preferredColorScheme(themeManager.effectiveColorScheme)
+                .animation(.easeInOut(duration: 0.6), value: themeManager.colorSchemePreference)
         }
         .alert("Clear API Token?", isPresented: $showingTokenAlert) {
             Button("Cancel", role: .cancel) { }
