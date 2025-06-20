@@ -72,13 +72,7 @@ struct HomeView: View {
         HStack {
             Text("InfiniQuiz")
                 .font(.system(size: 36, weight: .bold, design: .rounded))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [themeManager.currentTheme.accentColor, themeManager.currentTheme.accentColor.opacity(0.7)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .foregroundColor(themeManager.currentTheme.accentColor)
                 .scaleEffect(titleScale)
                 .animation(.spring(response: 0.5, dampingFraction: 0.6), value: titleScale)
             

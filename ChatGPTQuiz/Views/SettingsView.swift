@@ -4,7 +4,6 @@ struct SettingsView: View {
     @ObservedObject var viewModel: QuizViewModel
     @EnvironmentObject var themeManager: ThemeManager
     @Environment(\.dismiss) var dismiss
-    @Environment(\.colorScheme) var systemColorScheme
     @State private var apiToken: String = ""
     @State private var showingTokenAlert = false
     @State private var isTokenVisible = false
@@ -161,11 +160,6 @@ struct SettingsView: View {
                     .foregroundColor(themeManager.currentTheme.accentColor)
                 }
             }
-        }
-        .preferredColorScheme(themeManager.effectiveColorScheme)
-        .animation(.easeInOut(duration: 0.6), value: themeManager.colorSchemePreference)
-        .onAppear {
-            themeManager.refreshSystemColorScheme()
         }
         .sheet(isPresented: $showingThemeSelection) {
             ThemeSelectionView()

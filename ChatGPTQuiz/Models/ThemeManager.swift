@@ -6,16 +6,6 @@ enum ColorSchemePreference: String, CaseIterable {
     case light = "Light"
     case device = "Device Settings"
     
-    func colorScheme(systemScheme: ColorScheme) -> ColorScheme? {
-        switch self {
-        case .dark:
-            return .dark
-        case .light:
-            return .light
-        case .device:
-            return systemScheme
-        }
-    }
 }
 
 enum AppTheme: String, CaseIterable {
@@ -140,7 +130,6 @@ class ThemeManager: ObservableObject {
     @Published var currentTheme: AppTheme = .space
     @Published var isAnimating = false
     @Published var colorSchemePreference: ColorSchemePreference = .dark
-    @Published var systemColorScheme: ColorScheme = .dark
     
     private var timer: Timer?
     private let userDefaults = UserDefaults.standard
@@ -151,26 +140,18 @@ class ThemeManager: ObservableObject {
     init() {
         loadTheme()
         loadColorSchemePreference()
-        detectSystemColorScheme()
         setupAutoTheme()
     }
     
-    private func detectSystemColorScheme() {
-        let detectedScheme: ColorScheme = UITraitCollection.current.userInterfaceStyle == .dark ? .dark : .light
-        systemColorScheme = detectedScheme
-    }
-    
-    func refreshSystemColorScheme() {
-        let detectedScheme: ColorScheme = UITraitCollection.current.userInterfaceStyle == .dark ? .dark : .light
-        systemColorScheme = detectedScheme
-    }
-    
     var effectiveColorScheme: ColorScheme? {
-        colorSchemePreference.colorScheme(systemScheme: systemColorScheme)
-    }
-    
-    func updateSystemColorScheme(_ scheme: ColorScheme) {
-        systemColorScheme = scheme
+        switch colorSchemePreference {
+        case .dark:
+            return .dark
+        case .light:
+            return .light
+        case .device:
+            return nil
+        }
     }
     
     func setTheme(_ theme: AppTheme) {
