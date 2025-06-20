@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var viewModel: QuizViewModel
+    @EnvironmentObject var themeManager: ThemeManager
     @Environment(\.dismiss) var dismiss
     @State private var apiToken: String = ""
     @State private var showingTokenAlert = false
@@ -12,102 +13,88 @@ struct SettingsView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
-                    // API Token Section
-                    QuizCard {
+                    // Show API Token section first if no token exists
+                    if !viewModel.hasValidAPIToken {
+                        apiTokenSection
+                    }
+                    
+                    // Theme Selection Section
+                    VStack {
                         VStack(alignment: .leading, spacing: 16) {
-                            Text("OpenAI API Token")
-                                .font(.subheadingBold)
-                                .foregroundColor(.primaryText)
+                            Text("Theme")
+                                .font(.system(size: 22, weight: .bold, design: .rounded))
+                                .foregroundColor(.primary)
                             
-                            Text("Enter your OpenAI API token to generate quizzes. Your token is stored securely on your device.")
-                                .font(.bodyText)
-                                .foregroundColor(.secondaryText)
-                                .fixedSize(horizontal: false, vertical: true)
+                            Text("Choose your preferred color theme")
+                                .font(.system(size: 16, weight: .medium, design: .rounded))
+                                .foregroundColor(.secondary)
                             
-                            HStack {
-                                if isTokenVisible {
-                                    TextField(tokenPlaceholder, text: $apiToken)
-                                        .font(.bodyText)
-                                        .foregroundColor(.primaryText)
-                                        .autocapitalization(.none)
-                                        .disableAutocorrection(true)
-                                } else {
-                                    SecureField(tokenPlaceholder, text: $apiToken)
-                                        .font(.bodyText)
-                                        .foregroundColor(.primaryText)
-                                }
-                                
-                                if !apiToken.isEmpty {
-                                    Button(action: {
-                                        isTokenVisible.toggle()
-                                    }) {
-                                        Image(systemName: isTokenVisible ? "eye.slash" : "eye")
-                                            .foregroundColor(.secondaryText)
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
+                                ForEach(AppTheme.allCases, id: \.self) { theme in
+                                    ThemeCard(theme: theme, isSelected: themeManager.currentTheme == theme) {
+                                        themeManager.setTheme(theme)
                                     }
                                 }
                             }
-                            .padding()
-                            .background(Color.textFieldBackground)
-                            .cornerRadius(12)
-                            
-                            if !apiToken.isEmpty {
-                                PrimaryButton("Save Token") {
-                                    saveAPIToken()
-                                }
-                            }
                         }
+                    }
+                    .padding(24)
+                    .glassmorphic()
+                    
+                    // Show API Token section lower down if token exists
+                    if viewModel.hasValidAPIToken {
+                        apiTokenSection
                     }
                     
                     // Token Status
                     if viewModel.hasValidAPIToken {
-                        QuizCard {
+                        VStack {
                             HStack {
                                 Image(systemName: "checkmark.circle.fill")
-                                    .foregroundColor(.correctGreen)
+                                    .foregroundColor(.green)
                                 Text("API Token is configured")
-                                    .font(.bodyText)
-                                    .foregroundColor(.primaryText)
+                                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                                    .foregroundColor(.primary)
                                 Spacer()
                             }
                         }
+                        .padding(24)
+                        .glassmorphic()
                     }
                     
                     // Instructions
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("How to get an API Token")
-                            .font(.subheadingBold)
-                            .foregroundColor(.primaryText)
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Label("Visit platform.openai.com", systemImage: "1.circle.fill")
-                            Label("Sign in or create an account", systemImage: "2.circle.fill")
-                            Label("Navigate to API Keys section", systemImage: "3.circle.fill")
-                            Label("Create a new secret key", systemImage: "4.circle.fill")
-                            Label("Copy and paste it here", systemImage: "5.circle.fill")
+                    VStack {
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("How to get an API Token")
+                                .font(.system(size: 22, weight: .bold, design: .rounded))
+                                .foregroundColor(.primary)
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                StepLabel(number: "1", text: "Visit platform.openai.com")
+                                StepLabel(number: "2", text: "Sign in or create an account")
+                                StepLabel(number: "3", text: "Navigate to API Keys section")
+                                StepLabel(number: "4", text: "Create a new secret key")
+                                StepLabel(number: "5", text: "Copy and paste it here")
+                            }
                         }
-                        .font(.bodyText)
-                        .foregroundColor(.secondaryText)
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(Color.cardBackground)
-                    .cornerRadius(16)
+                    .padding(24)
+                    .glassmorphic()
                     
                     // Clear Token Button
                     if viewModel.hasValidAPIToken {
-                        Button(action: {
+                        AnimatedPrimaryButton(
+                            title: "Clear API Token",
+                            isLoading: false,
+                            accentColor: .red
+                        ) {
                             showingTokenAlert = true
-                        }) {
-                            Text("Clear API Token")
-                                .font(.bodyText)
-                                .foregroundColor(.incorrectRed)
                         }
-                        .padding(.top)
                     }
                 }
                 .padding()
             }
-            .background(Color.deepCharcoal)
+            .background(Color.clear)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -115,11 +102,10 @@ struct SettingsView: View {
                     Button("Done") {
                         dismiss()
                     }
-                    .foregroundColor(.accentBlue)
+                    .foregroundColor(themeManager.currentTheme.accentColor)
                 }
             }
         }
-        .dismissKeyboardOnTap()
         .alert("Clear API Token?", isPresented: $showingTokenAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Clear", role: .destructive) {
@@ -145,5 +131,123 @@ struct SettingsView: View {
         viewModel.saveAPIToken(apiToken)
         // Clear the field after saving for security
         apiToken = ""
+    }
+    
+    private var apiTokenSection: some View {
+        VStack {
+            VStack(alignment: .leading, spacing: 16) {
+                Text("OpenAI API Token")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+                
+                Text("Enter your OpenAI API token to generate quizzes. Your token is stored securely on your device.")
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                
+                HStack {
+                    if isTokenVisible {
+                        TextField(tokenPlaceholder, text: $apiToken)
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .foregroundColor(.primary)
+                            .autocapitalization(.none)
+                            .disableAutocorrection(true)
+                    } else {
+                        SecureField(tokenPlaceholder, text: $apiToken)
+                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .foregroundColor(.primary)
+                    }
+                    
+                    if !apiToken.isEmpty {
+                        Button(action: {
+                            isTokenVisible.toggle()
+                        }) {
+                            Image(systemName: isTokenVisible ? "eye.slash" : "eye")
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+                
+                if !apiToken.isEmpty {
+                    AnimatedPrimaryButton(
+                        title: "Save Token",
+                        isLoading: false,
+                        accentColor: themeManager.currentTheme.accentColor
+                    ) {
+                        saveAPIToken()
+                    }
+                }
+            }
+        }
+        .padding(24)
+        .glassmorphic()
+    }
+}
+
+struct ThemeCard: View {
+    let theme: AppTheme
+    let isSelected: Bool
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 12) {
+                // Theme preview
+                HStack(spacing: 4) {
+                    ForEach(0..<3) { _ in
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(
+                                LinearGradient(
+                                    colors: theme.gradientColors.prefix(2).map { $0 },
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(height: 30)
+                    }
+                }
+                
+                Text(theme.rawValue)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundColor(.primary)
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.white.opacity(isSelected ? 0.2 : 0.1))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(isSelected ? theme.accentColor : Color.white.opacity(0.3), lineWidth: isSelected ? 2 : 1)
+                    )
+            )
+            .scaleEffect(isSelected ? 1.05 : 1.0)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+
+struct StepLabel: View {
+    let number: String
+    let text: String
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Circle()
+                .fill(Color.blue)
+                .frame(width: 24, height: 24)
+                .overlay(
+                    Text(number)
+                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                )
+            
+            Text(text)
+                .font(.system(size: 16, weight: .medium, design: .rounded))
+                .foregroundColor(.secondary)
+        }
     }
 }

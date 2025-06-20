@@ -22,6 +22,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		B12ABD212E0565A600DA54AB /* ChatGPTQuizUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ChatGPTQuizUITests;
+			sourceTree = "<group>";
+		};
 		B1CEF4472E02025000672997 /* ChatGPTQuiz */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ChatGPTQuiz;
@@ -57,6 +62,7 @@
 			children = (
 				B1CEF4472E02025000672997 /* ChatGPTQuiz */,
 				B1CEF4812E0341EA00672997 /* ChatGPTQuizTests */,
+				B12ABD212E0565A600DA54AB /* ChatGPTQuizUITests */,
 				B1CEF4462E02025000672997 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -125,7 +131,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2600;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					B1CEF4442E02025000672997 = {

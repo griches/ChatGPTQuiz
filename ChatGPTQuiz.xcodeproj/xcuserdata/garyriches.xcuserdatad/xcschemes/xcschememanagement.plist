@@ -7,7 +7,35 @@
 		<key>ChatGPTQuiz.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
+		<key>ChatGPTQuizTests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
 			<integer>0</integer>
+		</dict>
+		<key>ChatGPTQuizUITests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>B12ABD1F2E0565A600DA54AB</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B1CEF4442E02025000672997</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B1CEF47F2E0341EA00672997</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>
