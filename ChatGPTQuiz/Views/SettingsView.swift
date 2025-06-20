@@ -31,7 +31,7 @@ struct SettingsView: View {
                                 .font(.system(size: 16, weight: .medium, design: .rounded))
                                 .foregroundColor(.secondary)
                             
-                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 2), spacing: 12) {
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
                                 ForEach(Array(AppTheme.allCases.prefix(4)), id: \.self) { theme in
                                     ThemeCard(theme: theme, isSelected: themeManager.currentTheme == theme) {
                                         themeManager.setTheme(theme)
@@ -294,7 +294,7 @@ struct ThemeSelectionView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 2), spacing: 16) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
                         ForEach(AppTheme.allCases, id: \.self) { theme in
                             ThemeCard(theme: theme, isSelected: themeManager.currentTheme == theme) {
                                 themeManager.setTheme(theme)
