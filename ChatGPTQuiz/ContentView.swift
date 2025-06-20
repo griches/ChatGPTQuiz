@@ -25,6 +25,7 @@ struct ContentView: View {
                         }
                     }
             }
+            .tint(themeManager.currentTheme.accentColor)
         }
         .environmentObject(themeManager)
         .preferredColorScheme(themeManager.effectiveColorScheme)
@@ -67,88 +68,90 @@ struct HomeView: View {
     @State private var cardOpacity: Double = 0
     @FocusState private var isTextFieldFocused: Bool
     
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Title Section
-                HStack {
-                    Text("InfiniQuiz")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
-                        .foregroundStyle(
-                            LinearGradient(
-                                colors: [themeManager.currentTheme.accentColor, themeManager.currentTheme.accentColor.opacity(0.7)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .scaleEffect(titleScale)
-                        .animation(.spring(response: 0.5, dampingFraction: 0.6), value: titleScale)
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        withAnimation(.spring()) {
-                            showingSettings = true
-                        }
-                    }) {
-                        Image(systemName: "gearshape.fill")
-                            .font(.title2)
-                            .foregroundColor(themeManager.currentTheme.accentColor)
-                            .rotationEffect(.degrees(showingSettings ? 180 : 0))
-                    }
+    private var titleSection: some View {
+        HStack {
+            Text("InfiniQuiz")
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [themeManager.currentTheme.accentColor, themeManager.currentTheme.accentColor.opacity(0.7)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .scaleEffect(titleScale)
+                .animation(.spring(response: 0.5, dampingFraction: 0.6), value: titleScale)
+            
+            Spacer()
+            
+            Button(action: {
+                isTextFieldFocused = false
+                withAnimation(.spring()) {
+                    showingSettings = true
                 }
-                .padding(.top, 20)
-                
-                // Quiz Input Section
-                VStack(spacing: 20) {
-                        TextField("Enter a subject", text: $viewModel.subject)
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
-                            .padding()
-                            .background(Color(.systemGray6))
-                            .foregroundColor(.primary)
-                            .cornerRadius(12)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(themeManager.currentTheme.accentColor.opacity(0.3), lineWidth: 1)
-                            )
-                            .focused($isTextFieldFocused)
-                        
-                        Picker("Number of Questions", selection: $viewModel.questionCount) {
-                            Text("10").tag(10)
-                            Text("20").tag(20)
-                        }
-                        .pickerStyle(.segmented)
-                        .background(themeManager.currentTheme.cardBackground)
-                        .cornerRadius(8)
-                        .onChange(of: viewModel.questionCount) { _, _ in
-                            viewModel.savePreferences()
-                        }
-                        
-                        if let error = viewModel.error {
-                            Text(error)
-                                .font(.bodyText)
-                                .foregroundColor(.incorrectRed)
-                                .padding(.horizontal)
-                        }
-                        
-                        AnimatedPrimaryButton(
-                            title: "Generate Quiz",
-                            isLoading: viewModel.isLoading,
-                            accentColor: themeManager.currentTheme.accentColor
-                        ) {
-                            Task {
-                                await viewModel.generateQuiz()
-                            }
-                        }
-                    }
-                .padding(24)
-                .glassmorphic()
-                .offset(y: cardOffset)
-                .opacity(cardOpacity)
-                .animation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.2), value: cardOffset)
-                
-                // Previous Quizzes Section
-                if !viewModel.previousQuizzes.isEmpty {
+            }) {
+                Image(systemName: "gearshape.fill")
+                    .font(.title2)
+                    .foregroundColor(themeManager.currentTheme.accentColor)
+                    .rotationEffect(.degrees(showingSettings ? 180 : 0))
+            }
+        }
+        .padding(.top, 20)
+    }
+    
+    private var quizInputSection: some View {
+        VStack(spacing: 20) {
+            TextField("Enter a subject", text: $viewModel.subject)
+                .font(.system(size: 16, weight: .medium, design: .rounded))
+                .padding()
+                .background(Color(.systemGray6))
+                .foregroundColor(.primary)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(themeManager.currentTheme.accentColor.opacity(0.3), lineWidth: 1)
+                )
+                .focused($isTextFieldFocused)
+            
+            Picker("Number of Questions", selection: $viewModel.questionCount) {
+                Text("10").tag(10)
+                Text("20").tag(20)
+            }
+            .pickerStyle(.segmented)
+            .background(themeManager.currentTheme.cardBackground)
+            .cornerRadius(8)
+            .onChange(of: viewModel.questionCount) { _, _ in
+                viewModel.savePreferences()
+            }
+            
+            if let error = viewModel.error {
+                Text(error)
+                    .font(.bodyText)
+                    .foregroundColor(.incorrectRed)
+                    .padding(.horizontal)
+            }
+            
+            AnimatedPrimaryButton(
+                title: "Generate Quiz",
+                isLoading: viewModel.isLoading,
+                accentColor: themeManager.currentTheme.accentColor
+            ) {
+                isTextFieldFocused = false
+                Task {
+                    await viewModel.generateQuiz()
+                }
+            }
+        }
+        .padding(24)
+        .glassmorphic()
+        .offset(y: cardOffset)
+        .opacity(cardOpacity)
+        .animation(.spring(response: 0.8, dampingFraction: 0.7).delay(0.2), value: cardOffset)
+    }
+    
+    @ViewBuilder
+    private var previousQuizzesSection: some View {
+        if !viewModel.previousQuizzes.isEmpty {
                     VStack {
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Previous Quizzes")
@@ -162,12 +165,13 @@ struct HomeView: View {
                                         questionCount: quiz.totalQuestions,
                                         accentColor: themeManager.currentTheme.accentColor
                                     ) {
+                                        isTextFieldFocused = false
                                         viewModel.playPreviousQuiz(quiz)
                                     }
                                     .listRowBackground(Color.clear)
                                     .listRowSeparator(.hidden)
                                     .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                         Button {
                                             // Add haptic feedback for swipe delete
                                             let impactFeedback = UIImpactFeedbackGenerator(style: .heavy)
@@ -178,9 +182,9 @@ struct HomeView: View {
                                             }
                                         } label: {
                                             Image(systemName: "trash")
-                                                .font(.system(size: 16, weight: .semibold))
+                                                .font(.system(size: 16, weight: .medium))
                                                 .foregroundColor(.white)
-                                                .frame(width: 50, height: 32)
+                                                .frame(width: 60, height: 60)
                                                 .background(
                                                     Capsule()
                                                         .fill(Color.red)
@@ -216,6 +220,16 @@ struct HomeView: View {
                         removal: .move(edge: .bottom).combined(with: .opacity)
                     ))
                 }
+    }
+    
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                titleSection
+                
+                quizInputSection
+                
+                previousQuizzesSection
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -223,17 +237,6 @@ struct HomeView: View {
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
         .navigationBarHidden(true)
-        .overlay(
-            // Invisible overlay for tap-to-dismiss keyboard when text field is focused
-            isTextFieldFocused ? 
-            Color.clear
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    isTextFieldFocused = false
-                }
-                .allowsHitTesting(true)
-            : nil
-        )
         .sheet(isPresented: $showingSettings) {
             SettingsView(viewModel: viewModel)
                 .environmentObject(themeManager)
