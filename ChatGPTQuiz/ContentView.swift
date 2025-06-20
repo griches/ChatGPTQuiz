@@ -27,6 +27,7 @@ struct ContentView: View {
             }
         }
         .environmentObject(themeManager)
+        .preferredColorScheme(themeManager.colorSchemePreference.colorScheme)
         .onChange(of: viewModel.shouldNavigateToQuiz) { _, shouldNavigate in
             if shouldNavigate {
                 path.append("QuizView")

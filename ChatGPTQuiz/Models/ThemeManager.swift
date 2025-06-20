@@ -1,6 +1,23 @@
 import SwiftUI
 import Combine
 
+enum ColorSchemePreference: String, CaseIterable {
+    case dark = "Dark"
+    case light = "Light"
+    case device = "Device Settings"
+    
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .dark:
+            return .dark
+        case .light:
+            return .light
+        case .device:
+            return nil
+        }
+    }
+}
+
 enum AppTheme: String, CaseIterable {
     case ocean = "Ocean"
     case coral = "Coral"
@@ -122,14 +139,17 @@ enum AppTheme: String, CaseIterable {
 class ThemeManager: ObservableObject {
     @Published var currentTheme: AppTheme = .space
     @Published var isAnimating = false
+    @Published var colorSchemePreference: ColorSchemePreference = .dark
     
     private var timer: Timer?
     private let userDefaults = UserDefaults.standard
     private let themeKey = "selectedTheme"
     private let autoThemeKey = "autoThemeEnabled"
+    private let colorSchemeKey = "colorSchemePreference"
     
     init() {
         loadTheme()
+        loadColorSchemePreference()
         setupAutoTheme()
     }
     
@@ -186,6 +206,24 @@ class ThemeManager: ObservableObject {
     
     private func saveTheme(_ theme: AppTheme) {
         userDefaults.set(theme.rawValue, forKey: themeKey)
+    }
+    
+    func setColorSchemePreference(_ preference: ColorSchemePreference) {
+        colorSchemePreference = preference
+        saveColorSchemePreference(preference)
+    }
+    
+    private func loadColorSchemePreference() {
+        if let savedPreferenceString = userDefaults.string(forKey: colorSchemeKey),
+           let savedPreference = ColorSchemePreference(rawValue: savedPreferenceString) {
+            colorSchemePreference = savedPreference
+        } else {
+            colorSchemePreference = .dark
+        }
+    }
+    
+    private func saveColorSchemePreference(_ preference: ColorSchemePreference) {
+        userDefaults.set(preference.rawValue, forKey: colorSchemeKey)
     }
     
     deinit {
