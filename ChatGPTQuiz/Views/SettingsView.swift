@@ -31,7 +31,7 @@ struct SettingsView: View {
                                 .font(.system(size: 16, weight: .medium, design: .rounded))
                                 .foregroundColor(.secondary)
                             
-                            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
+                            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 18), count: 2), spacing: 18) {
                                 ForEach(Array(AppTheme.allCases.prefix(4)), id: \.self) { theme in
                                     ThemeCard(theme: theme, isSelected: themeManager.currentTheme == theme) {
                                         themeManager.setTheme(theme)
@@ -276,10 +276,10 @@ struct ThemeCard: View {
                     .fill(Color.white.opacity(isSelected ? 0.2 : 0.1))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(isSelected ? theme.accentColor : Color.white.opacity(0.3), lineWidth: isSelected ? 2 : 1)
+                            .stroke(isSelected ? theme.accentColor : Color.white.opacity(0.3), lineWidth: 1)
                     )
             )
-            .scaleEffect(isSelected ? 1.05 : 1.0)
+            .scaleEffect(1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         }
         .buttonStyle(PlainButtonStyle())
@@ -293,8 +293,8 @@ struct ThemeSelectionView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
+                VStack(spacing: 18) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 18), count: 2), spacing: 18) {
                         ForEach(AppTheme.allCases, id: \.self) { theme in
                             ThemeCard(theme: theme, isSelected: themeManager.currentTheme == theme) {
                                 themeManager.setTheme(theme)
