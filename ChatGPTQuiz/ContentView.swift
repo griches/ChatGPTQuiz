@@ -234,6 +234,7 @@ struct HomeView: View {
         .sheet(isPresented: $showingSettings) {
             SettingsView(viewModel: viewModel)
                 .environmentObject(themeManager)
+                .preferredColorScheme(themeManager.effectiveColorScheme)
         }
         .onAppear {
             withAnimation {
