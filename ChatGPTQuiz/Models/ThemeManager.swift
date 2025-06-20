@@ -3,9 +3,15 @@ import Combine
 
 enum AppTheme: String, CaseIterable {
     case ocean = "Ocean"
-    case sunset = "Sunset"
+    case coral = "Coral"
     case forest = "Forest"
     case space = "Space"
+    case citrus = "Citrus"
+    case lavender = "Lavender"
+    case cherry = "Cherry"
+    case mint = "Mint"
+    case amber = "Amber"
+    case midnight = "Midnight"
     
     var gradientColors: [Color] {
         switch self {
@@ -16,7 +22,7 @@ enum AppTheme: String, CaseIterable {
                 Color(red: 0.1, green: 0.14, blue: 0.49),
                 Color(red: 0.02, green: 0.46, blue: 0.9)
             ]
-        case .sunset:
+        case .coral:
             return [
                 Color(red: 0.93, green: 0.61, blue: 0.65),
                 Color(red: 1.0, green: 0.87, blue: 0.88),
@@ -37,24 +43,78 @@ enum AppTheme: String, CaseIterable {
                 Color(red: 0.1, green: 0.1, blue: 0.18),
                 Color(red: 0.08, green: 0.12, blue: 0.19)
             ]
+        case .citrus:
+            return [
+                Color(red: 1.0, green: 0.65, blue: 0.2),
+                Color(red: 1.0, green: 0.8, blue: 0.4),
+                Color(red: 1.0, green: 0.45, blue: 0.0),
+                Color(red: 1.0, green: 0.65, blue: 0.2)
+            ]
+        case .lavender:
+            return [
+                Color(red: 0.7, green: 0.6, blue: 0.9),
+                Color(red: 0.85, green: 0.8, blue: 0.95),
+                Color(red: 0.55, green: 0.4, blue: 0.8),
+                Color(red: 0.7, green: 0.6, blue: 0.9)
+            ]
+        case .cherry:
+            return [
+                Color(red: 0.9, green: 0.2, blue: 0.4),
+                Color(red: 1.0, green: 0.6, blue: 0.7),
+                Color(red: 0.7, green: 0.1, blue: 0.3),
+                Color(red: 0.9, green: 0.2, blue: 0.4)
+            ]
+        case .mint:
+            return [
+                Color(red: 0.4, green: 0.8, blue: 0.7),
+                Color(red: 0.7, green: 0.9, blue: 0.85),
+                Color(red: 0.2, green: 0.6, blue: 0.5),
+                Color(red: 0.4, green: 0.8, blue: 0.7)
+            ]
+        case .amber:
+            return [
+                Color(red: 0.95, green: 0.7, blue: 0.3),
+                Color(red: 1.0, green: 0.85, blue: 0.6),
+                Color(red: 0.8, green: 0.5, blue: 0.1),
+                Color(red: 0.95, green: 0.7, blue: 0.3)
+            ]
+        case .midnight:
+            return [
+                Color(red: 0.05, green: 0.05, blue: 0.15),
+                Color(red: 0.15, green: 0.15, blue: 0.3),
+                Color(red: 0.0, green: 0.0, blue: 0.1),
+                Color(red: 0.05, green: 0.05, blue: 0.15)
+            ]
         }
     }
     
     var accentColor: Color {
         switch self {
         case .ocean: return Color(red: 0.39, green: 0.71, blue: 0.96)
-        case .sunset: return Color(red: 1.0, green: 0.54, blue: 0.5)
+        case .coral: return Color(red: 1.0, green: 0.54, blue: 0.5)
         case .forest: return Color(red: 0.51, green: 0.78, blue: 0.52)
         case .space: return Color(red: 0.49, green: 0.3, blue: 1.0)
+        case .citrus: return Color(red: 1.0, green: 0.55, blue: 0.0)
+        case .lavender: return Color(red: 0.6, green: 0.4, blue: 0.9)
+        case .cherry: return Color(red: 0.9, green: 0.15, blue: 0.35)
+        case .mint: return Color(red: 0.3, green: 0.7, blue: 0.6)
+        case .amber: return Color(red: 0.9, green: 0.6, blue: 0.2)
+        case .midnight: return Color(red: 0.4, green: 0.6, blue: 1.0)
         }
     }
     
     var cardBackground: Color {
         switch self {
         case .ocean: return Color.white.opacity(0.1)
-        case .sunset: return Color.white.opacity(0.15)
+        case .coral: return Color.white.opacity(0.15)
         case .forest: return Color.white.opacity(0.1)
         case .space: return Color.white.opacity(0.08)
+        case .citrus: return Color.white.opacity(0.12)
+        case .lavender: return Color.white.opacity(0.12)
+        case .cherry: return Color.white.opacity(0.1)
+        case .mint: return Color.white.opacity(0.12)
+        case .amber: return Color.white.opacity(0.12)
+        case .midnight: return Color.white.opacity(0.06)
         }
     }
 }
@@ -64,8 +124,12 @@ class ThemeManager: ObservableObject {
     @Published var isAnimating = false
     
     private var timer: Timer?
+    private let userDefaults = UserDefaults.standard
+    private let themeKey = "selectedTheme"
+    private let autoThemeKey = "autoThemeEnabled"
     
     init() {
+        loadTheme()
         setupAutoTheme()
     }
     
@@ -75,32 +139,53 @@ class ThemeManager: ObservableObject {
             currentTheme = theme
         }
         
+        // Save theme and disable auto-theme when user manually selects
+        saveTheme(theme)
+        userDefaults.set(false, forKey: autoThemeKey)
+        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             self.isAnimating = false
         }
     }
     
     private func setupAutoTheme() {
-        updateThemeBasedOnTime()
-        
-        timer = Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { _ in
-            self.updateThemeBasedOnTime()
+        // Only setup auto-theme if enabled and no manual theme is saved
+        if userDefaults.bool(forKey: autoThemeKey) && userDefaults.string(forKey: themeKey) == nil {
+            updateThemeBasedOnTime()
+            
+            timer = Timer.scheduledTimer(withTimeInterval: 3600, repeats: true) { _ in
+                self.updateThemeBasedOnTime()
+            }
         }
     }
     
     private func updateThemeBasedOnTime() {
+        // Only auto-update if auto-theme is enabled
+        guard userDefaults.bool(forKey: autoThemeKey) else { return }
+        
         let hour = Calendar.current.component(.hour, from: Date())
         
         switch hour {
         case 6..<12:
-            setTheme(.ocean)
+            currentTheme = .ocean
         case 12..<17:
-            setTheme(.forest)
+            currentTheme = .forest
         case 17..<20:
-            setTheme(.sunset)
+            currentTheme = .coral
         default:
-            setTheme(.space)
+            currentTheme = .space
         }
+    }
+    
+    private func loadTheme() {
+        if let savedThemeString = userDefaults.string(forKey: themeKey),
+           let savedTheme = AppTheme(rawValue: savedThemeString) {
+            currentTheme = savedTheme
+        }
+    }
+    
+    private func saveTheme(_ theme: AppTheme) {
+        userDefaults.set(theme.rawValue, forKey: themeKey)
     }
     
     deinit {

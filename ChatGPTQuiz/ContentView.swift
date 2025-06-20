@@ -63,6 +63,7 @@ struct HomeView: View {
     @State private var titleScale: CGFloat = 0.8
     @State private var cardOffset: CGFloat = 50
     @State private var cardOpacity: Double = 0
+    @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
         ScrollView {
@@ -108,6 +109,7 @@ struct HomeView: View {
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(themeManager.currentTheme.accentColor.opacity(0.3), lineWidth: 1)
                             )
+                            .focused($isTextFieldFocused)
                         
                         Picker("Number of Questions", selection: $viewModel.questionCount) {
                             Text("10").tag(10)
@@ -200,7 +202,19 @@ struct HomeView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .scrollBounceBehavior(.basedOnSize)
+        .scrollDismissesKeyboard(.interactively)
         .navigationBarHidden(true)
+        .overlay(
+            // Invisible overlay for tap-to-dismiss keyboard when text field is focused
+            isTextFieldFocused ? 
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    isTextFieldFocused = false
+                }
+                .allowsHitTesting(true)
+            : nil
+        )
         .sheet(isPresented: $showingSettings) {
             SettingsView(viewModel: viewModel)
                 .environmentObject(themeManager)
@@ -214,6 +228,7 @@ struct HomeView: View {
         }
     }
 }
+
 
 #Preview {
     ContentView()

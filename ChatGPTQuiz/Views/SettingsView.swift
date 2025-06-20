@@ -8,6 +8,7 @@ struct SettingsView: View {
     @State private var showingTokenAlert = false
     @State private var isTokenVisible = false
     @State private var tokenPlaceholder: String = "sk-..."
+    @State private var showingThemeSelection = false
     
     var body: some View {
         NavigationView {
@@ -30,12 +31,38 @@ struct SettingsView: View {
                                 .foregroundColor(.secondary)
                             
                             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
-                                ForEach(AppTheme.allCases, id: \.self) { theme in
+                                ForEach(Array(AppTheme.allCases.prefix(4)), id: \.self) { theme in
                                     ThemeCard(theme: theme, isSelected: themeManager.currentTheme == theme) {
                                         themeManager.setTheme(theme)
                                     }
                                 }
                             }
+                            
+                            Button(action: {
+                                showingThemeSelection = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "paintpalette.fill")
+                                        .font(.system(size: 18))
+                                    Text("More Themes")
+                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 14, weight: .semibold))
+                                }
+                                .foregroundColor(themeManager.currentTheme.accentColor)
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 16)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(themeManager.currentTheme.accentColor.opacity(0.1))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(themeManager.currentTheme.accentColor.opacity(0.3), lineWidth: 1)
+                                        )
+                                )
+                            }
+                            .padding(.top, 8)
                         }
                     }
                     .padding(24)
@@ -63,20 +90,20 @@ struct SettingsView: View {
                     }
                     
                     // Instructions
-                    VStack {
-                        VStack(alignment: .leading, spacing: 16) {
-                            Text("How to get an API Token")
-                                .font(.system(size: 22, weight: .bold, design: .rounded))
-                                .foregroundColor(.primary)
-                            
-                            VStack(alignment: .leading, spacing: 12) {
-                                StepLabel(number: "1", text: "Visit platform.openai.com")
-                                StepLabel(number: "2", text: "Sign in or create an account")
-                                StepLabel(number: "3", text: "Navigate to API Keys section")
-                                StepLabel(number: "4", text: "Create a new secret key")
-                                StepLabel(number: "5", text: "Copy and paste it here")
-                            }
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("How to get an API Token")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .foregroundColor(.primary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            StepLabel(number: "1", text: "Visit platform.openai.com")
+                            StepLabel(number: "2", text: "Sign in or create an account")
+                            StepLabel(number: "3", text: "Navigate to API Keys section")
+                            StepLabel(number: "4", text: "Create a new secret key")
+                            StepLabel(number: "5", text: "Copy and paste it here")
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(24)
                     .glassmorphic()
@@ -105,6 +132,10 @@ struct SettingsView: View {
                     .foregroundColor(themeManager.currentTheme.accentColor)
                 }
             }
+        }
+        .sheet(isPresented: $showingThemeSelection) {
+            ThemeSelectionView()
+                .environmentObject(themeManager)
         }
         .alert("Clear API Token?", isPresented: $showingTokenAlert) {
             Button("Cancel", role: .cancel) { }
@@ -196,19 +227,9 @@ struct ThemeCard: View {
         Button(action: action) {
             VStack(spacing: 12) {
                 // Theme preview
-                HStack(spacing: 4) {
-                    ForEach(0..<3) { _ in
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(
-                                LinearGradient(
-                                    colors: theme.gradientColors.prefix(2).map { $0 },
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .frame(height: 30)
-                    }
-                }
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(theme.accentColor)
+                    .frame(height: 30)
                 
                 Text(theme.rawValue)
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -227,6 +248,39 @@ struct ThemeCard: View {
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
         }
         .buttonStyle(PlainButtonStyle())
+    }
+}
+
+struct ThemeSelectionView: View {
+    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 20) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
+                        ForEach(AppTheme.allCases, id: \.self) { theme in
+                            ThemeCard(theme: theme, isSelected: themeManager.currentTheme == theme) {
+                                themeManager.setTheme(theme)
+                            }
+                        }
+                    }
+                }
+                .padding()
+            }
+            .background(Color.clear)
+            .navigationTitle("Choose Theme")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .foregroundColor(themeManager.currentTheme.accentColor)
+                }
+            }
+        }
     }
 }
 
