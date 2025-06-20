@@ -294,7 +294,7 @@ struct ThemeSelectionView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 16) {
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 2), spacing: 16) {
                         ForEach(AppTheme.allCases, id: \.self) { theme in
                             ThemeCard(theme: theme, isSelected: themeManager.currentTheme == theme) {
                                 themeManager.setTheme(theme)
