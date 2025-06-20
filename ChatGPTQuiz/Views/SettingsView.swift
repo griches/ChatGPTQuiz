@@ -18,6 +18,25 @@ struct SettingsView: View {
                     // Show API Token section first if no token exists
                     if !viewModel.hasValidAPIToken {
                         apiTokenSection
+                        
+                        // Instructions for getting API token
+                        VStack(alignment: .leading, spacing: 16) {
+                            Text("How to get an API Token")
+                                .font(.system(size: 22, weight: .bold, design: .rounded))
+                                .foregroundColor(.primary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            VStack(alignment: .leading, spacing: 12) {
+                                StepLabel(number: "1", text: "Visit platform.openai.com")
+                                StepLabel(number: "2", text: "Sign in or create an account")
+                                StepLabel(number: "3", text: "Navigate to API Keys section")
+                                StepLabel(number: "4", text: "Create a new secret key")
+                                StepLabel(number: "5", text: "Copy and paste it here")
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding(24)
+                        .glassmorphic()
                     }
                     
                     // Theme Selection Section
@@ -117,24 +136,6 @@ struct SettingsView: View {
                         .glassmorphic()
                     }
                     
-                    // Instructions
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("How to get an API Token")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .foregroundColor(.primary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        
-                        VStack(alignment: .leading, spacing: 12) {
-                            StepLabel(number: "1", text: "Visit platform.openai.com")
-                            StepLabel(number: "2", text: "Sign in or create an account")
-                            StepLabel(number: "3", text: "Navigate to API Keys section")
-                            StepLabel(number: "4", text: "Create a new secret key")
-                            StepLabel(number: "5", text: "Copy and paste it here")
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .padding(24)
-                    .glassmorphic()
                     
                     // Clear Token Button
                     if viewModel.hasValidAPIToken {
